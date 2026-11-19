@@ -15,6 +15,7 @@ jobs:
       run: |
         if ls *.zip 1> /dev/null 2>&1; then
           unzip -o *.zip
+          rm *.zip
         fi
 
     - name: Set up JDK 17
@@ -23,16 +24,15 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+
+    - name: Generate Gradle Wrapper
+      run: |
+        gradle wrapper
+
     - name: Build debug APK
       run: |
-        GRADLEW_PATH=$(find . -name "gradlew" -type f | head -n 1)
-        if [ -z "$GRADLEW_PATH" ]; then
-          echo "Ошибка: файл gradlew не найден в архиве!"
-          exit 1
-        fi
-        PROJECT_DIR=$(dirname "$GRADLEW_PATH")
-        echo "Найден проект в директории: $PROJECT_DIR"
-        cd "$PROJECT_DIR"
         chmod +x gradlew
         ./gradlew assembleDebug --stacktrace
 
